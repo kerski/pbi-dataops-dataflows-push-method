@@ -373,7 +373,7 @@ if(!$ConfigResult) {
 #Set AzureDevOpsBranch
 $ConfigResult = az functionapp config appsettings set --name $AZFuncName `
                                       --resource-group $ResourceGroupName `
-                                      --settings "AzureDevOpsBranch=refs/heads/part22"
+                                      --settings "AzureDevOpsBranch=refs/heads/main"
 
 if(!$ConfigResult) {
     Write-Error "Unable to update AzureDevOpsBranch setting for Azure Function '$($AzFuncName)' "
@@ -410,13 +410,14 @@ if (Get-Module -ListAvailable -Name "MicrosoftPowerBIMgmt") {
 Login-PowerBI
 
 #Get Premium Per User Capacity as it will be used to assign to new workspace
-$Cap = Get-PowerBICapacity -Scope Individual
+$Cap = Get-PowerBICapacity -Scope Individual | Where-Object {$_.DisplayName -like "Premium Per User*"}
 
 if(!$Cap.DisplayName -like "Premium Per User*")
 {
     Write-Error "Script expects Premium Per Use Capacity."
     return
 }
+
 
 #Create Build Workspace
 New-PowerBIWorkspace -Name $BuildWSName
